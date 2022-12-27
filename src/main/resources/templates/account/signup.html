@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th=http://www.thymeleaf.org>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+          integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <style>
+        .container {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body class="be-light">
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+    <a class="navbar-brand" href="/" th:href="@{/}">
+        <img src="/images/springboot.png" width="30" height="30">
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <form th:action="@{/search/exmeeting}" class="form-inline" method="get">
+                    <input class="form-control mr-sm-2" name="keyword" type="search" placeholder="交流会 検索"
+                           aria-label="Search"/>
+                </form>
+            </li>
+        </ul>
+
+        <ul class="navbar-nav justify-content-end">
+            <li class="nav-item">
+                <a class="nav-link" href="#" th:href="@{/login}">ログイン</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" th:href="@{/signup}">会員登録</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container">
+    <div class="py-5 text-center">
+        <h2>会員登録 Page</h2>
+    </div>
+    <div class="row justify-content-center">
+        <form class="needs-validation col-sm-6" action="#"
+              th:action="@{/signup}" th:object="${signupForm}" method="post" novalidate>
+            <div class="form-group">
+                <label for="nickname">ニックネーム</label>
+                <input id="nickname" type="text" th:field="*{nickname}" class="form-control"
+                       placeholder="nickname" aria-describedby="nicknameHelp" required minlength="3" maxlength="20">
+                <small id="nicknameHelp" class="form-text text-muted">
+                    空欄なし文字と数字のみにしてください。
+                </small>
+                <small class="invalid-feedback">ニックネームを入力してください</small>
+                <small class="form-text text-danger" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}">Nickname
+                    Error</small>
+            </div>
+
+            <div class="form-group">
+                <label for="email">メール</label>
+                <input id="email" type="email" th:field="*{email}" class="form-control"
+                       placeholder="your@email.com" aria-describedby="emailHelp" required>
+                <small id="emailHelp" class="form-text text-muted">
+                    入力したメールは公開しません。
+                </small>
+                <small class="invalid-feedback">メールを入力してください。</small>
+                <small class="form-text text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email
+                    Error</small>
+            </div>
+
+            <div class="form-group">
+                <label for="password">暗証番号</label>
+                <input id="password" type="password" th:field="*{password}" class="form-control"
+                       aria-describedby="passwordHelp" required minlength="8" maxlength="50">
+                <small id="passwordHelp" class="form-text text-muted">
+                    8字から50字以内に入力してください、空欄は入力できません。
+                </small>
+                <small class="invalid-feedback">Passwordを入力してください。</small>
+                <small class="form-text text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password
+                    Error</small>
+            </div>
+
+            <div class="form-group">
+                <button class="btn btn-primary btn-block" type="submit"
+                        aria-describedby="submitHelp">会員登録
+                </button>
+                <small id="submitHelp" class="form-text text-muted">
+                    <a href="#">情報扱い</a>について同意すると登録ボタンをクリックしてください。
+                </small>
+            </div>
+        </form>
+    </div>
+
+    <footer th:fragment="footer">
+        <div class="row justify-content-center">
+            <small class="d-block mb-3 text-muted">新しい出会い&copy; 2023</small>
+        </div>
+    </footer>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"
+        integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+        crossorigin="anonymous"></script>
+
+<script type="application/javascript">
+    (function () {
+        'use strict';
+
+        window.addEventListener('load', function () {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+
+            // Loop over them and prevent submission
+            Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        }, false)
+    }())
+</script>
+</body>
+</html>
