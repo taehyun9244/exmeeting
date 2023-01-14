@@ -14,7 +14,7 @@
 <body class="be-light">
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
     <a class="navbar-brand" href="/" th:href="@{/}">
-        <img src="/images/springboot.png" width="30" height="30">
+        <img src="/images/party.png" width="30" height="30">
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,8 +25,9 @@
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
                 <form th:action="@{/search/exmeeting}" class="form-inline" method="get">
-                    <input class="form-control mr-sm-2" name="keyword" type="search" placeholder="交流会 検索"
+                    <input class="form-control mr-sm-2" name="keyword" type="search" placeholder="交流会"
                            aria-label="Search"/>
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">検索</button>
                 </form>
             </li>
         </ul>

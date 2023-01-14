@@ -7,14 +7,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Slf4j
 public class AccountService {
 
     private final AccountRepository accountRepository;
@@ -22,7 +22,8 @@ public class AccountService {
 
     public Account createAccount(SignupForm signupForm) {
         String passwordEncode = passwordEncoder.encode(signupForm.getPassword());
-        Account createAccount = new Account(signupForm, passwordEncode);
+        Account account = new Account(signupForm, passwordEncode);
+        Account createAccount = accountRepository.save(account);
         return createAccount;
     }
 
