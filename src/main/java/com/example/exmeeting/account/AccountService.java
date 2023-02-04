@@ -1,15 +1,13 @@
 package com.example.exmeeting.account;
 
+import com.example.exmeeting.account.dto.LoginDto;
+import com.example.exmeeting.account.dto.SignupDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -19,20 +17,21 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
-    public Account createAccount(SignupForm signupForm) {
-        String passwordEncode = passwordEncoder.encode(signupForm.getPassword());
-        Account account = new Account(signupForm, passwordEncode);
-        Account createAccount = accountRepository.save(account);
-        return createAccount;
+    public Account createAccount(SignupDto signupDto) {
+        Account newAccount = modelMapper.map(signupDto, Account.class);
+        passwordEncoder.encode(newAccount.getPassword());
+        accountRepository.save(newAccount);
+        return newAccount;
     }
 
-    public void login(Account newAccount) {
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                new UserAccount(newAccount),
-                newAccount.getPassword(),
-                List.of(new SimpleGrantedAuthority("ROLE_USER")));
-
-        SecurityContextHolder.getContext().setAuthentication(token);
+    public Account login(LoginDto loginDto) {
+        Account logngAccount = accountRepository.findByEmail(loginDto.getEmail()).orElseThrow(
+                ()-> new IllegalArgumentException("登録してないEmailです"));
+        if (!passwordEncoder.matches(loginDto.getPassword(), logngAccount.getPassword())) {
+            throw new IllegalArgumentException("間違ってるPasswordです" );
+        };
+        return logngAccount;
     }
 }

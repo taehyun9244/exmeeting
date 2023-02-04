@@ -1,16 +1,14 @@
 package com.example.exmeeting.account;
 
+import com.example.exmeeting.account.dto.LoginDto;
+import com.example.exmeeting.account.dto.SignupDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Slf4j
 @Controller
@@ -19,24 +17,15 @@ public class AccountController {
 
     private final AccountService accountService;
 
-    @GetMapping("/signup")
-    public String accountView(Model model){
-        model.addAttribute("signupForm", new SignupForm());
-        return "account/signup";
+    @PostMapping("/signup")
+    public ResponseEntity<Void> signup(@RequestBody SignupDto signupDto) {
+        accountService.createAccount(signupDto);
+        return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/signup")
-    public String createAccount(@Validated @ModelAttribute SignupForm signupForm, BindingResult bindingResult) {
-
-        //validator fail
-        if (bindingResult.hasErrors()) {
-            log.info("errors={} ", bindingResult);
-            return "account/signup";
-        }
-
-        //validator success
-        Account account = accountService.createAccount(signupForm);
-        accountService.login(account);
-        return "redirect:/";
+    @PostMapping("/login")
+    public ResponseEntity<Account> login(@RequestBody LoginDto loginDto) {
+        Account account = accountService.login(loginDto);
+        return ResponseEntity.ok(account);
     }
 }

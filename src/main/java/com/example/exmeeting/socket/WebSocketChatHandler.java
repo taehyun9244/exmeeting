@@ -1,4 +1,4 @@
-package com.example.exmeeting.handler;
+package com.example.exmeeting.socket;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -9,13 +9,13 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 @Slf4j
 @Component
-public class WebSockChatHandler extends TextWebSocketHandler {
+public class WebSocketChatHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
         log.info("payload = {}", payload);
-        TextMessage textMessage = new TextMessage("채팅이 시작되었습니다");
+        TextMessage textMessage = new TextMessage("チャットが始まりました。");
         session.sendMessage(textMessage);
     }
 }

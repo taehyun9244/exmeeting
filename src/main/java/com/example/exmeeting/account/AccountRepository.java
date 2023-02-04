@@ -2,8 +2,8 @@ package com.example.exmeeting.account;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AccountRepository extends JpaRepository<Account, Long> {
-    boolean existsByEmail(String email);
-    boolean existsByNickname(String nickname);
+import java.util.Optional;
 
+public interface AccountRepository extends JpaRepository<Account, Long> {
+    Optional<Account> findByEmail(String email);
 }

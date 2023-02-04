@@ -10,7 +10,7 @@
 //@RequiredArgsConstructor
 //@Configuration
 //@EnableWebSocket
-//public class WebSockConfig implements WebSocketConfigurer {
+//public class WebSocketConfig implements WebSocketConfigurer {
 //    private final WebSocketHandler webSocketHandler;
 //
 //    @Override

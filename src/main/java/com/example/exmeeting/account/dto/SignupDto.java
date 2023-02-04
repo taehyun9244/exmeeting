@@ -1,4 +1,4 @@
-package com.example.exmeeting.account;
+package com.example.exmeeting.account.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import javax.validation.constraints.Pattern;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SignupForm {
+public class SignupDto {
 
     @NotBlank(message = "日本語でニックネームを入力してください")
     @Pattern(regexp = "^[a-zA-Z0-9가-힇ㄱ-ㅎㅏ-ㅣぁ-ゔァ-ヴー々〆〤一-龥]*$", message = "空欄は入れないでください")
