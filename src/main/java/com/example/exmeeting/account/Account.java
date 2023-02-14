@@ -1,6 +1,5 @@
 package com.example.exmeeting.account;
 
-import com.example.exmeeting.account.dto.SignupDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,13 +30,4 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private AccountRole accountRole;
 
-    private boolean chatEnrollmentResultByEmail;
-
-    private boolean chatEnrollmentResultByWeb = true;
-
-    public Account(SignupDto signupDto, String passwordEncode) {
-        this.nickname = signupDto.getNickname();
-        this.password = passwordEncode;
-        this.email = signupDto.getEmail();
-    }
 }

@@ -26,4 +26,7 @@ public class SignupDto {
     @Email
     private String email;
 
+//    @NotBlank(message = "roleを入力してください")
+//    private String role;
+
 }

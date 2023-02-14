@@ -14,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 public class JwtTokenProvider {
 
     private final Key key;
+    private final UserDetails userDetails;
 
     //ユーザーの情報でAccessToken, RefreshToken生産するMethod
     public JwtTokenProvider(@Value("${jwt.token.key}") String secretKey) {
@@ -79,6 +81,8 @@ public class JwtTokenProvider {
 
         // UserDetailsのObjectを作ってAuthenticationをReturn
         UserDetails principal = new User(claims.getSubject(), "", authorities);
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 

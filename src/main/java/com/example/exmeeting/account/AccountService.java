@@ -2,12 +2,18 @@ package com.example.exmeeting.account;
 
 import com.example.exmeeting.account.dto.LoginDto;
 import com.example.exmeeting.account.dto.SignupDto;
+import com.example.exmeeting.account.dto.TokenInfoDto;
+import com.example.exmeeting.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -16,22 +22,35 @@ import org.springframework.transaction.annotation.Transactional;
 public class AccountService {
 
     private final AccountRepository accountRepository;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
-    private final ModelMapper modelMapper;
 
     public Account createAccount(SignupDto signupDto) {
-        Account newAccount = modelMapper.map(signupDto, Account.class);
-        passwordEncoder.encode(newAccount.getPassword());
-        accountRepository.save(newAccount);
-        return newAccount;
+        signupDuplicateCheck(signupDto);
+        Account newAccount = Account.builder()
+                .nickname(signupDto.getNickname())
+                .email(signupDto.getEmail())
+                .password(passwordEncoder.encode(signupDto.getPassword())).build();
+        Account createAccount = accountRepository.save(newAccount);
+        return createAccount;
     }
 
-    public Account login(LoginDto loginDto) {
-        Account logngAccount = accountRepository.findByEmail(loginDto.getEmail()).orElseThrow(
-                ()-> new IllegalArgumentException("登録してないEmailです"));
-        if (!passwordEncoder.matches(loginDto.getPassword(), logngAccount.getPassword())) {
-            throw new IllegalArgumentException("間違ってるPasswordです" );
-        };
-        return logngAccount;
+    public TokenInfoDto login(LoginDto loginDto) {
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        TokenInfoDto tokenInfo = jwtTokenProvider.generateToken(authentication);
+        return tokenInfo;
+    }
+
+    private void signupDuplicateCheck(SignupDto signupDto) {
+        Optional<Account> existEmail = accountRepository.findByEmail(signupDto.getEmail());
+        Optional<Account> existNickname = accountRepository.findByNickname(signupDto.getNickname());
+
+        if (existEmail.isPresent()) {
+            throw new IllegalArgumentException("登録しているemailです");
+        } else if (existNickname.isPresent()) {
+            throw new IllegalArgumentException("登録しているnicknameです");
+        }
     }
 }
