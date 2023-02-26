@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -14,9 +15,10 @@ import org.springframework.stereotype.Service;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final AccountRepository accountRepository;
+    private final PasswordEncoder passwordEncoder;
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return accountRepository.findByEmail(email)
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return accountRepository.findByEmail(username)
                 .map(this::createUserDetails)
                 .orElseThrow(() -> new UsernameNotFoundException("登録してないEmailです"));
     }
@@ -24,7 +26,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails createUserDetails(Account account) {
         return User.builder()
                 .username(account.getEmail())
-                .password(account.getPassword())
+                .password(passwordEncoder.encode(account.getPassword()))
                 .roles(String.valueOf(account.getAccountRole()))
                 .build();
     }

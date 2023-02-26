@@ -4,9 +4,7 @@ import com.example.exmeeting.account.dto.TokenInfoDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,7 +12,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -28,7 +25,6 @@ import java.util.stream.Collectors;
 public class JwtTokenProvider {
 
     private final Key key;
-    private final UserDetails userDetails;
 
     //ユーザーの情報でAccessToken, RefreshToken生産するMethod
     public JwtTokenProvider(@Value("${jwt.token.key}") String secretKey) {
@@ -80,10 +76,8 @@ public class JwtTokenProvider {
                         .collect(Collectors.toList());
 
         // UserDetailsのObjectを作ってAuthenticationをReturn
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
-
-        UserDetails userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+        UserDetails userDetails = new User(claims.getSubject(), "", authorities);
+        return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
     }
 
     // JWT Tokenの情報を検証するMethod

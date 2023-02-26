@@ -1,5 +1,7 @@
 package com.example.exmeeting.security.config;
 
+import com.example.exmeeting.security.jwt.JwtAccessDeniedHandler;
+import com.example.exmeeting.security.jwt.JwtAuthenticationEntryPoint;
 import com.example.exmeeting.security.jwt.JwtAuthenticationFilter;
 import com.example.exmeeting.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -31,6 +35,10 @@ public class SecurityConfig {
                .antMatcher("images")
                .httpBasic().disable()
                .csrf().disable()
+               .exceptionHandling()
+               .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+               .accessDeniedHandler(jwtAccessDeniedHandler)
+               .and()
                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                .and()
