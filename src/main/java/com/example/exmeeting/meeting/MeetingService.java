@@ -1,15 +1,14 @@
 package com.example.exmeeting.meeting;
 
 import com.example.exmeeting.account.Account;
+import com.example.exmeeting.account.AccountRepository;
 import com.example.exmeeting.exception.UserNotFoundException;
 import com.example.exmeeting.meeting.dto.MeetingAllDto;
 import com.example.exmeeting.meeting.dto.MeetingByIdDto;
 import com.example.exmeeting.meeting.dto.MeetingCreateDto;
-import com.example.exmeeting.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +20,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Transactional
 public class MeetingService {
+    private final AccountRepository accountRepository;
 
     private final MeetingRepository meetingRepository;
     private final ModelMapper modelMapper;
@@ -46,8 +46,7 @@ public class MeetingService {
         return meetingByIdDto;
     }
 
-    public Meeting createMeeting(MeetingCreateDto meetingCreateDto, UserDetailsImpl userDetails) {
-        Account account = userLogin(userDetails);
+    public Meeting createMeeting(MeetingCreateDto meetingCreateDto, Account account) {
         Meeting meeting = Meeting.builder()
                 .title(meetingCreateDto.getTitle())
                 .subtitle(meetingCreateDto.getSubtitle())
@@ -59,18 +58,18 @@ public class MeetingService {
         return saveMeeting;
     }
 
-    public Meeting patchMeeting(Long id, UserDetailsImpl userDetails, MeetingCreateDto meetingCreateDto) {
-        Account account = userDetails.getAccount();
+    public Meeting patchMeeting(Long id, Long accountId, MeetingCreateDto meetingCreateDto) {
+        Account account = getAccount(accountId);
         return meetingRepository.save(editMeeting(id, meetingCreateDto, account));
     }
 
-    public Meeting putMeeting(Long id, UserDetailsImpl userDetails, MeetingCreateDto meetingCreateDto) {
-        Account account = userLogin(userDetails);
+    public Meeting putMeeting(Long id, Long accountId, MeetingCreateDto meetingCreateDto) {
+        Account account = getAccount(accountId);
         return meetingRepository.save(editMeeting(id, meetingCreateDto, account));
     }
 
-    public void deleteMeeting(Long id, UserDetailsImpl userDetails) {
-        Account account = userLogin(userDetails);
+    public void deleteMeeting(Long id, Long accountId) {
+        Account account = getAccount(accountId);
         Meeting findMeeting = getMeeting(id);
         if (findMeeting.getAccount().equals(account)) {
             meetingRepository.delete(findMeeting);
@@ -78,8 +77,7 @@ public class MeetingService {
     }
 
 
-
-    private Meeting editMeeting(Long id, MeetingCreateDto meetingCreateDto, Account account) {
+    private Meeting editMeeting(Long id, MeetingCreateDto meetingCreateDto, Object account) {
         Meeting findMeeting = getMeeting(id);
         if (findMeeting.getAccount().equals(account)) {
             Meeting editMeeting = Meeting.builder()
@@ -98,12 +96,11 @@ public class MeetingService {
         return findMeeting;
     }
 
-    private static Account userLogin(UserDetailsImpl userDetails) {
-        Account account = userDetails.getAccount();
-        if (account == null){
-            throw new UserNotFoundException(String.format("ID[%s] not found", account.getEmail()));
-        }
-        return account;
+    private Account getAccount(Long accountId) {
+        Account findAccount = accountRepository.findById(accountId).orElseThrow(
+                () -> new UserNotFoundException("user not found")
+        );
+        return findAccount;
     }
 
 }

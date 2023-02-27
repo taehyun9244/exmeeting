@@ -3,16 +3,21 @@ package com.example.exmeeting.account;
 import com.example.exmeeting.account.dto.LoginDto;
 import com.example.exmeeting.account.dto.SignupDto;
 import com.example.exmeeting.account.dto.TokenInfoDto;
+import com.example.exmeeting.security.UserAccount;
 import com.example.exmeeting.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -37,16 +42,30 @@ public class AccountService {
     }
 
     public TokenInfoDto login(LoginDto loginDto) {
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        TokenInfoDto tokenInfo = jwtTokenProvider.generateToken(authentication);
+        Account account = getAccount(loginDto);
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                new UserAccount(account),
+                account.getPassword(),
+                List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        SecurityContextHolder.getContext().setAuthentication(token);
+        TokenInfoDto tokenInfo = jwtTokenProvider.generateToken(token);
         return tokenInfo;
     }
+
+    private Account getAccount(LoginDto loginDto) {
+        Account account = accountRepository.findByEmail(loginDto.getEmail()).orElseThrow(
+                () -> new UsernameNotFoundException("email not found")
+        );
+        if (!passwordEncoder.matches(loginDto.getPassword(), account.getPassword())){
+            throw new RuntimeException("無効なパスワードです");
+        }
+        return account;
+    }
+
 
     private void signupDuplicateCheck(SignupDto signupDto) {
         Optional<Account> existEmail = accountRepository.findByEmail(signupDto.getEmail());
         Optional<Account> existNickname = accountRepository.findByNickname(signupDto.getNickname());
-
         if (existEmail.isPresent()) {
             throw new IllegalArgumentException("登録しているemailです");
         } else if (existNickname.isPresent()) {

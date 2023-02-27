@@ -27,7 +27,6 @@ public class SecurityConfig {
                .antMatchers(HttpMethod.GET, "/exMeeting/**").permitAll()
                .anyRequest().authenticated()
            .and()
-
                .antMatcher("images")
                .httpBasic().disable()
                .csrf().disable()

@@ -28,7 +28,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
         // 2. validateTokenを通じてTokenの有効性検査
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            // Tokenあg有効する場合TokenからAuthentication ObjectをGetしてSecurityContextにSave
+            // Tokenが有効する場合TokenからAuthenticationのObjectをGetしてSecurityContextにSave
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer")) {
+        if (StringUtils.hasText(bearerToken)) {
             return bearerToken.substring(7);
         }
         return null;

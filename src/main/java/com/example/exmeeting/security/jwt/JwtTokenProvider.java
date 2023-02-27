@@ -4,10 +4,9 @@ import com.example.exmeeting.account.dto.TokenInfoDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.CachingUserDetailsService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,15 +22,15 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
-@Component
 @Slf4j
+@Component
 public class JwtTokenProvider {
 
     private final Key key;
-    private final UserDetails userDetails;
-
+    private final UserDetailsService userDetailsService;
     //ユーザーの情報でAccessToken, RefreshToken生産するMethod
-    public JwtTokenProvider(@Value("${jwt.token.key}") String secretKey) {
+    public JwtTokenProvider(@Value("${jwt.token.key}") String secretKey, UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
@@ -66,25 +65,28 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String accessToken) {
-        // Token 復号化
+        // 토큰 복호화
         Claims claims = parseClaims(accessToken);
 
         if (claims.get("auth") == null) {
-            throw new RuntimeException("権限情報がないTokenです。");
+            throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
 
-        // claimsから権限情報を探す
+        // 클레임에서 권한 정보 가져오기
         Collection<? extends GrantedAuthority> authorities =
                 Arrays.stream(claims.get("auth").toString().split(","))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-        // UserDetailsのObjectを作ってAuthenticationをReturn
+        // UserDetails 객체를 만들어서 Authentication 리턴
         UserDetails principal = new User(claims.getSubject(), "", authorities);
-
-        UserDetails userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
+
+//    public Authentication getAuthentication(String accessToken) {
+//        UserDetails userDetails = userDetailsService.loadUserByUsername(this.parseClaims(accessToken).toString());
+//        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+//    }
 
     // JWT Tokenの情報を検証するMethod
     public boolean validateToken(String token) {

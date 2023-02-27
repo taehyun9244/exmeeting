@@ -1,13 +1,15 @@
 package com.example.exmeeting.meeting;
 
+import com.example.exmeeting.account.Account;
 import com.example.exmeeting.meeting.dto.MeetingAllDto;
 import com.example.exmeeting.meeting.dto.MeetingByIdDto;
 import com.example.exmeeting.meeting.dto.MeetingCreateDto;
-import com.example.exmeeting.security.UserDetailsImpl;
+import com.example.exmeeting.security.CurrentAccount;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,30 +36,35 @@ public class MeetingController {
 
     @PostMapping("/meetings")
     public ResponseEntity<Meeting> createMeeting(@RequestBody MeetingCreateDto meetingCreateDto,
-                                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        Meeting meeting = meetingService.createMeeting(meetingCreateDto, userDetails);
+                                                 @CurrentAccount Account account) {
+        Meeting meeting = meetingService.createMeeting(meetingCreateDto, account);
         return ResponseEntity.ok(meeting);
     }
 
     @PatchMapping("/meetings/patch/{id}")
-    public ResponseEntity<Meeting> patchMeeting(@PathVariable Long id,
-                                               @AuthenticationPrincipal UserDetailsImpl userDetails,
-                                               @RequestBody MeetingCreateDto meetingCreateDto) {
-        Meeting meeting = meetingService.patchMeeting(id, userDetails, meetingCreateDto);
+    public ResponseEntity<Meeting> patchMeeting(@PathVariable Long id, @RequestBody MeetingCreateDto meetingCreateDto) {
+        Meeting meeting = meetingService.patchMeeting(id, getAuthentication(), meetingCreateDto);
         return ResponseEntity.ok(meeting);
     }
 
+
+
     @PutMapping("/meetings/put/{id}")
-    public ResponseEntity<Meeting> putMeeting(@PathVariable Long id,
-                                              @AuthenticationPrincipal UserDetailsImpl userDetails,
-                                              @RequestBody MeetingCreateDto meetingCreateDto) {
-        Meeting meeting = meetingService.putMeeting(id, userDetails, meetingCreateDto);
+    public ResponseEntity<Meeting> putMeeting(@PathVariable Long id, @RequestBody MeetingCreateDto meetingCreateDto) {
+        Meeting meeting = meetingService.putMeeting(id, getAuthentication(), meetingCreateDto);
         return ResponseEntity.ok(meeting);
     }
 
     @DeleteMapping("/meetings/{id}")
-    public ResponseEntity<String> deleteMeeting (@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        meetingService.deleteMeeting(id, userDetails);
+    public ResponseEntity<String> deleteMeeting (@PathVariable Long id) {
+        meetingService.deleteMeeting(id, getAuthentication());
         return ResponseEntity.ok("delete");
+    }
+
+    private static Long getAuthentication() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long accountId = Long.valueOf(authentication.getPrincipal().toString());
+        log.info("accountId", accountId);
+        return accountId;
     }
 }
