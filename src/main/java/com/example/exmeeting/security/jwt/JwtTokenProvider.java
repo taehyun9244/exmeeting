@@ -1,6 +1,7 @@
 package com.example.exmeeting.security.jwt;
 
 import com.example.exmeeting.account.dto.TokenInfoDto;
+import com.example.exmeeting.security.CustomUserDetailsService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -25,9 +26,12 @@ import java.util.stream.Collectors;
 public class JwtTokenProvider {
 
     private final Key key;
-
+    private final CustomUserDetailsService userDetailsService;
     //ユーザーの情報でAccessToken, RefreshToken生産するMethod
-    public JwtTokenProvider(@Value("${jwt.token.key}") String secretKey) {
+    public JwtTokenProvider(@Value("${jwt.token.key}")
+                            String secretKey,
+                            CustomUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
@@ -76,8 +80,9 @@ public class JwtTokenProvider {
                         .collect(Collectors.toList());
 
         // UserDetailsのObjectを作ってAuthenticationをReturn
-        UserDetails userDetails = new User(claims.getSubject(), "", authorities);
-        return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
+//        UserDetails userDetails = new User(claims.getSubject(), "", authorities);
+        UserDetails principal = userDetailsService.loadUserByUsername(claims.getSubject());
+        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
     // JWT Tokenの情報を検証するMethod

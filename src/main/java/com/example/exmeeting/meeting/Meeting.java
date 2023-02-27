@@ -15,7 +15,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 public class Meeting {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)

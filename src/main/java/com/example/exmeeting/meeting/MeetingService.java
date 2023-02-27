@@ -1,15 +1,12 @@
 package com.example.exmeeting.meeting;
 
 import com.example.exmeeting.account.Account;
-import com.example.exmeeting.exception.UserNotFoundException;
 import com.example.exmeeting.meeting.dto.MeetingAllDto;
 import com.example.exmeeting.meeting.dto.MeetingByIdDto;
 import com.example.exmeeting.meeting.dto.MeetingCreateDto;
-import com.example.exmeeting.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,8 +43,7 @@ public class MeetingService {
         return meetingByIdDto;
     }
 
-    public Meeting createMeeting(MeetingCreateDto meetingCreateDto, UserDetailsImpl userDetails) {
-        Account account = userLogin(userDetails);
+    public Meeting createMeeting(MeetingCreateDto meetingCreateDto, Account account) {
         Meeting meeting = Meeting.builder()
                 .title(meetingCreateDto.getTitle())
                 .subtitle(meetingCreateDto.getSubtitle())
@@ -59,51 +55,50 @@ public class MeetingService {
         return saveMeeting;
     }
 
-    public Meeting patchMeeting(Long id, UserDetailsImpl userDetails, MeetingCreateDto meetingCreateDto) {
-        Account account = userDetails.getAccount();
-        return meetingRepository.save(editMeeting(id, meetingCreateDto, account));
-    }
-
-    public Meeting putMeeting(Long id, UserDetailsImpl userDetails, MeetingCreateDto meetingCreateDto) {
-        Account account = userLogin(userDetails);
-        return meetingRepository.save(editMeeting(id, meetingCreateDto, account));
-    }
-
-    public void deleteMeeting(Long id, UserDetailsImpl userDetails) {
-        Account account = userLogin(userDetails);
-        Meeting findMeeting = getMeeting(id);
-        if (findMeeting.getAccount().equals(account)) {
-            meetingRepository.delete(findMeeting);
-        } else throw new IllegalArgumentException("You are not the author of this post");
-    }
-
-
-
-    private Meeting editMeeting(Long id, MeetingCreateDto meetingCreateDto, Account account) {
-        Meeting findMeeting = getMeeting(id);
-        if (findMeeting.getAccount().equals(account)) {
-            Meeting editMeeting = Meeting.builder()
-                    .title(meetingCreateDto.getTitle())
-                    .subtitle(meetingCreateDto.getSubtitle())
-                    .body(meetingCreateDto.getBody())
-                    .location(meetingCreateDto.getLocation()).build();
-            return editMeeting;
-        } else throw new IllegalArgumentException("You are not the author of this post");
-    }
-
+//    public Meeting patchMeeting(Long id, MeetingCreateDto meetingCreateDto) {
+//        return meetingRepository.save(editMeeting(id, meetingCreateDto));
+//    }
+//
+//    public Meeting putMeeting(Long id, MeetingCreateDto meetingCreateDto) {
+//        return meetingRepository.save(editMeeting(id, meetingCreateDto));
+//    }
+//
+//    public void deleteMeeting(Long id) {
+//        Meeting findMeeting = getMeeting(id);
+//        if (findMeeting.getAccount().equals(account)) {
+//            meetingRepository.delete(findMeeting);
+//        } else throw new IllegalArgumentException("You are not the author of this post");
+//    }
+//
+//
+//
+//    private Meeting editMeeting(Long id, MeetingCreateDto meetingCreateDto, Account account) {
+//        Meeting findMeeting = getMeeting(id);
+//        if (findMeeting.getAccount().equals(account)) {
+//            Meeting editMeeting = Meeting.builder()
+//                    .title(meetingCreateDto.getTitle())
+//                    .subtitle(meetingCreateDto.getSubtitle())
+//                    .body(meetingCreateDto.getBody())
+//                    .location(meetingCreateDto.getLocation()).build();
+//            return editMeeting;
+//        } else throw new IllegalArgumentException("You are not the author of this post");
+//    }
+//
     private Meeting getMeeting(Long id) {
         Meeting findMeeting = meetingRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("can not found meeting")
         );
         return findMeeting;
     }
-
-    private static Account userLogin(UserDetailsImpl userDetails) {
-        Account account = userDetails.getAccount();
-        if (account == null){
-            throw new UserNotFoundException(String.format("ID[%s] not found", account.getEmail()));
-        }
-        return account;
-    }
+//
+//    private static Account userLogin(UserDetailsImpl userDetails) {
+//        Account account = userDetails.getAccount();
+//        log.info("login account email = {}", account.getEmail());
+//        log.info("login account nickname = {}", account.getNickname());
+//        if (account == null){
+//            throw new UserNotFoundException(String.format("ID[%s] not found", account.getEmail()));
+//        }
+//        return account;
+//    }
 
 }

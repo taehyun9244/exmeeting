@@ -3,17 +3,17 @@ package com.example.exmeeting.account;
 import com.example.exmeeting.account.dto.LoginDto;
 import com.example.exmeeting.account.dto.SignupDto;
 import com.example.exmeeting.account.dto.TokenInfoDto;
+import com.example.exmeeting.security.UserAccount;
 import com.example.exmeeting.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.security.auth.login.FailedLoginException;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -23,7 +23,6 @@ import java.util.Optional;
 public class AccountService {
 
     private final AccountRepository accountRepository;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
@@ -38,14 +37,14 @@ public class AccountService {
     }
 
     public TokenInfoDto login(LoginDto loginDto) {
-        Account account = checkIdOrPassword(loginDto);
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(account.getEmail(), account.getPassword());
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        TokenInfoDto tokenInfo = jwtTokenProvider.generateToken(authentication);
+        Account account = checkIdAndPassword(loginDto);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                new UserAccount(account), account.getPassword(),  List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        TokenInfoDto tokenInfo = jwtTokenProvider.generateToken(authenticationToken);
         return tokenInfo;
     }
 
-    private Account checkIdOrPassword(LoginDto loginDto) {
+    private Account checkIdAndPassword(LoginDto loginDto) {
         Account account = accountRepository.findByEmail(loginDto.getEmail()).orElseThrow(
                 () -> new IllegalArgumentException("등록되어 있지 않는 메일입니다!!!")
         );

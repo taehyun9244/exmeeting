@@ -16,11 +16,24 @@ class AccountControllerTest {
     private AccountService accountService;
 
     @Test
-    @DisplayName("Account signup")
+    @DisplayName("회원가입 처리 입력값 오류")
+    void signUpSubmit_with_wrong_input() {
+
+    }
+
+    @Test
+    @DisplayName("회원가입 처리 입력값 정상")
     void signUpSubmit_with_correct_input() {
     }
 
     @Test
-    void login() {
+    @DisplayName("로그인 틀린 입력 jwt token 반환 안됨")
+    void loginSubmit_with_wrong_input() {
+
+    }
+
+    @Test
+    @DisplayName("로그인 정상 입력 jwt token 받기")
+    void loginSubmit_with_correct_input() {
     }
 }
