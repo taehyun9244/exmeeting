@@ -42,17 +42,14 @@ public class AccountService {
     }
 
     public TokenInfoDto login(LoginDto loginDto) {
-        Account account = getAccount(loginDto);
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                new UserAccount(account),
-                account.getPassword(),
-                List.of(new SimpleGrantedAuthority("ROLE_USER")));
-        SecurityContextHolder.getContext().setAuthentication(token);
-        TokenInfoDto tokenInfo = jwtTokenProvider.generateToken(token);
+        Account account = checkIdAndPassword(loginDto);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                new UserAccount(account), account.getPassword(),  List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        TokenInfoDto tokenInfo = jwtTokenProvider.generateToken(authenticationToken);
         return tokenInfo;
     }
 
-    private Account getAccount(LoginDto loginDto) {
+    private Account checkIdAndPassword(LoginDto loginDto) {
         Account account = accountRepository.findByEmail(loginDto.getEmail()).orElseThrow(
                 () -> new UsernameNotFoundException("email not found")
         );
@@ -61,7 +58,6 @@ public class AccountService {
         }
         return account;
     }
-
 
     private void signupDuplicateCheck(SignupDto signupDto) {
         Optional<Account> existEmail = accountRepository.findByEmail(signupDto.getEmail());

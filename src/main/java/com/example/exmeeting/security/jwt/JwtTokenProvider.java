@@ -79,14 +79,9 @@ public class JwtTokenProvider {
                         .collect(Collectors.toList());
 
         // UserDetails 객체를 만들어서 Authentication 리턴
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
+        UserDetails principal = userDetailsService.loadUserByUsername(claims.getSubject());
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
-
-//    public Authentication getAuthentication(String accessToken) {
-//        UserDetails userDetails = userDetailsService.loadUserByUsername(this.parseClaims(accessToken).toString());
-//        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-//    }
 
     // JWT Tokenの情報を検証するMethod
     public boolean validateToken(String token) {

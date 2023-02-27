@@ -15,17 +15,13 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final AccountRepository accountRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return accountRepository.findByEmail(email)
-                .map(this::createUserDetails)
-                .orElseThrow(() -> new UsernameNotFoundException("해당하는 유저를 찾을 수 없습니다."));
-    }
-
-    private UserDetails createUserDetails(Account account) {
-        return UserAccount.builder()
-                .username(account.getEmail())
-                .password(account.getPassword())
-                .roles("ROLE_USER")
-                .build();
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Account account = accountRepository.findByEmail(username).orElseThrow(
+                () -> new UsernameNotFoundException("username not found")
+        );
+        if (account == null) {
+            throw new UsernameNotFoundException("username null");
+        }
+        return new UserAccount(account);
     }
 }
