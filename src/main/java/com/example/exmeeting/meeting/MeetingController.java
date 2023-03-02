@@ -42,29 +42,26 @@ public class MeetingController {
     }
 
     @PatchMapping("/meetings/patch/{id}")
-    public ResponseEntity<Meeting> patchMeeting(@PathVariable Long id, @RequestBody MeetingCreateDto meetingCreateDto) {
-        Meeting meeting = meetingService.patchMeeting(id, getAuthentication(), meetingCreateDto);
+    public ResponseEntity<Meeting> patchMeeting(@PathVariable Long id,
+                                                @RequestBody MeetingCreateDto meetingCreateDto,
+                                                @CurrentAccount Account account) {
+        Meeting meeting = meetingService.patchMeeting(id, account, meetingCreateDto);
         return ResponseEntity.ok(meeting);
     }
 
 
 
     @PutMapping("/meetings/put/{id}")
-    public ResponseEntity<Meeting> putMeeting(@PathVariable Long id, @RequestBody MeetingCreateDto meetingCreateDto) {
-        Meeting meeting = meetingService.putMeeting(id, getAuthentication(), meetingCreateDto);
+    public ResponseEntity<Meeting> putMeeting(@PathVariable Long id,
+                                              @RequestBody MeetingCreateDto meetingCreateDto,
+                                              @CurrentAccount Account account) {
+        Meeting meeting = meetingService.putMeeting(id, account, meetingCreateDto);
         return ResponseEntity.ok(meeting);
     }
 
     @DeleteMapping("/meetings/{id}")
-    public ResponseEntity<String> deleteMeeting (@PathVariable Long id) {
-        meetingService.deleteMeeting(id, getAuthentication());
+    public ResponseEntity<String> deleteMeeting (@PathVariable Long id, @CurrentAccount Account account) {
+        meetingService.deleteMeeting(id, account);
         return ResponseEntity.ok("delete");
-    }
-
-    private static Long getAuthentication() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Long accountId = Long.valueOf(authentication.getPrincipal().toString());
-        log.info("accountId", accountId);
-        return accountId;
     }
 }

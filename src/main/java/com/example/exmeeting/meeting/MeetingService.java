@@ -58,18 +58,15 @@ public class MeetingService {
         return saveMeeting;
     }
 
-    public Meeting patchMeeting(Long id, Long accountId, MeetingCreateDto meetingCreateDto) {
-        Account account = getAccount(accountId);
+    public Meeting patchMeeting(Long id, Account account, MeetingCreateDto meetingCreateDto) {
         return meetingRepository.save(editMeeting(id, meetingCreateDto, account));
     }
 
-    public Meeting putMeeting(Long id, Long accountId, MeetingCreateDto meetingCreateDto) {
-        Account account = getAccount(accountId);
+    public Meeting putMeeting(Long id, Account account, MeetingCreateDto meetingCreateDto) {
         return meetingRepository.save(editMeeting(id, meetingCreateDto, account));
     }
 
-    public void deleteMeeting(Long id, Long accountId) {
-        Account account = getAccount(accountId);
+    public void deleteMeeting(Long id, Account account) {
         Meeting findMeeting = getMeeting(id);
         if (findMeeting.getAccount().equals(account)) {
             meetingRepository.delete(findMeeting);
@@ -77,7 +74,7 @@ public class MeetingService {
     }
 
 
-    private Meeting editMeeting(Long id, MeetingCreateDto meetingCreateDto, Object account) {
+    private Meeting editMeeting(Long id, MeetingCreateDto meetingCreateDto, Account account) {
         Meeting findMeeting = getMeeting(id);
         if (findMeeting.getAccount().equals(account)) {
             Meeting editMeeting = Meeting.builder()
@@ -95,12 +92,4 @@ public class MeetingService {
         );
         return findMeeting;
     }
-
-    private Account getAccount(Long accountId) {
-        Account findAccount = accountRepository.findById(accountId).orElseThrow(
-                () -> new UserNotFoundException("user not found")
-        );
-        return findAccount;
-    }
-
 }
