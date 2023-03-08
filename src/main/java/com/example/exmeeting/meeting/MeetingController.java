@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class MeetingController {
     }
 
     @PostMapping("/meetings")
-    public ResponseEntity<Meeting> createMeeting(@RequestBody MeetingCreateDto meetingCreateDto,
+    public ResponseEntity<Meeting> createMeeting(@RequestBody @Validated MeetingCreateDto meetingCreateDto,
                                                  @CurrentAccount Account account) {
         Meeting meeting = meetingService.createMeeting(meetingCreateDto, account);
         return ResponseEntity.ok(meeting);

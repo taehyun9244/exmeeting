@@ -17,16 +17,23 @@ import java.util.Date;
 public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    public final ResponseEntity<Object> handlerAllException(Exception e, WebRequest request){
+    public final ResponseEntity<Object> handlerServerException(Exception e, WebRequest request){
         ExceptionResponse exceptionResponse =
-                new ExceptionResponse(new Date(), e.getMessage(), request.getDescription(false));
+                new ExceptionResponse(new Date(), e.getMessage(), request.getDescription(false), 500);
         return new ResponseEntity(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+//    @ExceptionHandler(Exception.class)
+//    public final ResponseEntity<Object> handlerClientException(Exception e, WebRequest request){
+//        ExceptionResponse exceptionResponse =
+//                new ExceptionResponse(new Date(), e.getMessage(), request.getDescription(false), 500);
+//        return new ResponseEntity(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
 
     @ExceptionHandler(UserNotFoundException.class)
     public final ResponseEntity<Object>handlerUserNotFoundException(Exception e, WebRequest request){
         ExceptionResponse exceptionResponse =
-                new ExceptionResponse(new Date(), e.getMessage(), request.getDescription(false));
+                new ExceptionResponse(new Date(), e.getMessage(), request.getDescription(false), 405);
         return new ResponseEntity(exceptionResponse, HttpStatus.NOT_FOUND);
     }
 
@@ -36,7 +43,7 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
                                                                   HttpStatus status,
                                                                   WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), "Validation Failed",
-                ex.getBindingResult().toString());
+                ex.getBindingResult().toString(), 400);
         return new ResponseEntity(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 }

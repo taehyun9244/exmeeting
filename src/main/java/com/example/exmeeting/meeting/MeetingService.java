@@ -2,7 +2,6 @@ package com.example.exmeeting.meeting;
 
 import com.example.exmeeting.account.Account;
 import com.example.exmeeting.account.AccountRepository;
-import com.example.exmeeting.exception.UserNotFoundException;
 import com.example.exmeeting.meeting.dto.MeetingAllDto;
 import com.example.exmeeting.meeting.dto.MeetingByIdDto;
 import com.example.exmeeting.meeting.dto.MeetingCreateDto;
@@ -68,7 +67,7 @@ public class MeetingService {
 
     public void deleteMeeting(Long id, Account account) {
         Meeting findMeeting = getMeeting(id);
-        if (findMeeting.getAccount().equals(account)) {
+        if (findMeeting.getAccount().getNickname().equals(account.getNickname())) {
             meetingRepository.delete(findMeeting);
         } else throw new IllegalArgumentException("You are not the author of this post");
     }
@@ -86,7 +85,7 @@ public class MeetingService {
         } else throw new IllegalArgumentException("You are not the author of this post");
     }
 
-    private Meeting getMeeting(Long id) {
+    public Meeting getMeeting(Long id) {
         Meeting findMeeting = meetingRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("can not found meeting")
         );
