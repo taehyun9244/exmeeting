@@ -15,7 +15,7 @@ import javax.validation.constraints.Pattern;
 @AllArgsConstructor
 public class SignupDto {
 
-    @NotBlank(message = "日本語でニックネームを入力してください")
+    @NotBlank
     @Pattern(regexp = "^[a-zA-Z0-9가-힇ㄱ-ㅎㅏ-ㅣぁ-ゔァ-ヴー々〆〤一-龥]*$", message = "空欄は入れないでください")
     private String nickname;
 
@@ -25,8 +25,4 @@ public class SignupDto {
     @NotBlank(message = "メールの形式が正しくありません")
     @Email
     private String email;
-
-//    @NotBlank(message = "roleを入力してください")
-//    private String role;
-
 }
