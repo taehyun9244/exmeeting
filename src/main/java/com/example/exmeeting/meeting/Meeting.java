@@ -1,17 +1,16 @@
 package com.example.exmeeting.meeting;
 
 import com.example.exmeeting.account.Account;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.example.exmeeting.meeting.dto.MeetingCreateDto;
+import com.example.exmeeting.meeting.dto.MeetingOnlyTitleDto;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
-@Builder
 @Getter
-@NoArgsConstructor
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Meeting {
 
@@ -35,4 +34,10 @@ public class Meeting {
     @JoinColumn(name = "account_id")
     private Account account;
 
+    public void editMeeting(MeetingCreateDto meetingEditDto) {
+        this.title = meetingEditDto.getTitle();
+        this.subtitle = meetingEditDto.getSubtitle();;
+        this.body = meetingEditDto.getBody();
+        this.location = meetingEditDto.getLocation();
+    }
 }

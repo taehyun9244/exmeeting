@@ -22,6 +22,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
        return http
+               .csrf().disable()
                .authorizeRequests()
                .antMatchers("/", "/login", "/signup", "/h2-console/**").permitAll()
                .antMatchers(HttpMethod.GET, "/exMeeting/**").permitAll()
@@ -29,7 +30,6 @@ public class SecurityConfig {
            .and()
                .antMatcher("images")
                .httpBasic().disable()
-               .csrf().disable()
                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                .and()

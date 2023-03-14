@@ -4,12 +4,11 @@ import com.example.exmeeting.account.Account;
 import com.example.exmeeting.meeting.dto.MeetingAllDto;
 import com.example.exmeeting.meeting.dto.MeetingByIdDto;
 import com.example.exmeeting.meeting.dto.MeetingCreateDto;
+import com.example.exmeeting.meeting.dto.MeetingOnlyTitleDto;
 import com.example.exmeeting.security.CurrentAccount;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,19 +43,18 @@ public class MeetingController {
 
     @PatchMapping("/meetings/patch/{id}")
     public ResponseEntity<Meeting> patchMeeting(@PathVariable Long id,
-                                                @RequestBody MeetingCreateDto meetingCreateDto,
+                                                @RequestBody MeetingOnlyTitleDto onlyTitleDto,
                                                 @CurrentAccount Account account) {
-        Meeting meeting = meetingService.patchMeeting(id, account, meetingCreateDto);
+        Meeting meeting = meetingService.patchMeeting(id, account, onlyTitleDto);
         return ResponseEntity.ok(meeting);
     }
 
 
-
     @PutMapping("/meetings/put/{id}")
     public ResponseEntity<Meeting> putMeeting(@PathVariable Long id,
-                                              @RequestBody MeetingCreateDto meetingCreateDto,
+                                              @RequestBody MeetingCreateDto meetingEditDto,
                                               @CurrentAccount Account account) {
-        Meeting meeting = meetingService.putMeeting(id, account, meetingCreateDto);
+        Meeting meeting = meetingService.putMeeting(id, account, meetingEditDto);
         return ResponseEntity.ok(meeting);
     }
 
